@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Do you love me?</title>
+    <title>For My Bayko ❤️</title>
     <style>
         body {
             display: flex;
@@ -17,6 +17,56 @@
             overflow: hidden;
         }
         
+        /* Auth Screen Styles */
+        #auth-screen {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 20;
+        }
+
+        #auth-screen h2 {
+            color: #ff4d4d;
+            margin-bottom: 10px;
+        }
+
+        #auth-screen input {
+            padding: 10px;
+            font-size: 1.2rem;
+            border: 2px solid #ff9999;
+            border-radius: 5px;
+            margin-top: 15px;
+            width: 80%;
+            text-align: center;
+        }
+
+        #auth-btn {
+            margin-top: 20px;
+            background-color: #ff4d4d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        #auth-error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* Main Game Styles */
+        #main-screen {
+            display: none; /* Hidden until correct answer */
+            flex-direction: column;
+            align-items: center;
+        }
+
         h1 {
             color: #ff4d4d;
             font-size: 3rem;
@@ -58,40 +108,138 @@
             color: white;
             position: relative;
             transition: top 0.2s ease, left 0.2s ease;
-            z-index: 999; /* Forces the No button to ALWAYS stay on top */
+            z-index: 999;
         }
         
         #success-message {
             display: none;
-            color: #ff4d4d;
-            font-size: 3rem;
+            color: #d32f2f;
+            font-size: 2.5rem;
             font-weight: bold;
+            text-align: center;
             margin-top: 20px;
             z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        #no-count-display {
+            font-size: 1.5rem;
+            color: #333;
+            margin-top: 15px;
+        }
+
+        /* EMOJI ANIMATIONS */
+        .emoji {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none; /* So they don't block clicks */
+            z-index: 5;
+        }
+
+        /* Sad Emoji Animation */
+        @keyframes floatUpFade {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+
+        /* Heart Drop Animation */
+        @keyframes dropDown {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <h1 id="question">Do you love me? ❤️</h1>
-    
-    <div class="buttons-container" id="btn-container">
-        <button id="yes-btn">Yes</button>
-        <button id="no-btn">No</button>
+    <!-- 1. The Secret Gatekeeper Screen -->
+    <div id="auth-screen">
+        <h2>Hold on! 🛑</h2>
+        <!-- CHANGE YOUR QUESTION HERE -->
+        <p>What is my favorite nickname for you? (Only my bayko knows this!)</p>
+        
+        <input type="text" id="secret-answer" placeholder="Type answer here...">
+        <br>
+        <button id="auth-btn">Unlock</button>
+        <p id="auth-error">That's not it! Try again.</p>
     </div>
 
-    <div id="success-message">I knew it! 🥰💖</div>
+    <!-- 2. The Main Question Screen -->
+    <div id="main-screen">
+        <h1 id="question">Do you love me? ❤️</h1>
+        
+        <div class="buttons-container" id="btn-container">
+            <button id="yes-btn">Yes</button>
+            <button id="no-btn">No</button>
+        </div>
+    </div>
+
+    <!-- 3. The Success Screen -->
+    <div id="success-message">
+        I was waiting for your yes! I love you too! 🥰💖
+        <div id="no-count-display"></div>
+    </div>
 
     <script>
+        // --- AUTHENTICATION LOGIC ---
+        // CHANGE YOUR SECRET ANSWER HERE (Keep it in lowercase for the code to work easily)
+        const CORRECT_ANSWER = "pillu"; 
+
+        const authBtn = document.getElementById('auth-btn');
+        const authInput = document.getElementById('secret-answer');
+        const authError = document.getElementById('auth-error');
+        const authScreen = document.getElementById('auth-screen');
+        const mainScreen = document.getElementById('main-screen');
+
+        authBtn.addEventListener('click', () => {
+            const userAnswer = authInput.value.trim().toLowerCase();
+            if (userAnswer === CORRECT_ANSWER) {
+                authScreen.style.display = 'none';
+                mainScreen.style.display = 'flex';
+            } else {
+                authError.style.display = 'block';
+            }
+        });
+
+
+        // --- GAME LOGIC ---
         const noBtn = document.getElementById('no-btn');
         const yesBtn = document.getElementById('yes-btn');
         const question = document.getElementById('question');
         const btnContainer = document.getElementById('btn-container');
         const successMessage = document.getElementById('success-message');
+        const noCountDisplay = document.getElementById('no-count-display');
         
         let yesScale = 1; 
+        let noCount = 0; // Tracks how many times she clicked/hovered on No
 
-        function dodgeButton() {
+        function createSadEmoji(x, y) {
+            const emojis = ['😢', '😭', '💔', '🥺'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            const emojiEl = document.createElement('div');
+            emojiEl.classList.add('emoji');
+            emojiEl.innerText = randomEmoji;
+            emojiEl.style.left = `${x}px`;
+            emojiEl.style.top = `${y}px`;
+            emojiEl.style.animation = 'floatUpFade 2s forwards';
+            
+            document.body.appendChild(emojiEl);
+
+            // Remove it from the screen after 2 seconds
+            setTimeout(() => {
+                emojiEl.remove();
+            }, 2000);
+        }
+
+        function dodgeButton(event) {
+            noCount++; // Increase the count
+
+            // Get current position of the No button to spawn sad emojis there
+            const rect = noBtn.getBoundingClientRect();
+            createSadEmoji(rect.left + 20, rect.top);
+
             noBtn.style.position = 'absolute';
 
             const maxX = window.innerWidth - noBtn.offsetWidth;
@@ -115,10 +263,38 @@
             dodgeButton();
         });
 
+        // --- SUCCESS LOGIC (Hearts & Message) ---
+        function spawnHearts() {
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('emoji');
+                heart.innerText = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = '-50px';
+                heart.style.fontSize = (Math.random() * 20 + 20) + 'px'; // Random sizes
+                heart.style.animation = `dropDown ${Math.random() * 2 + 2}s linear forwards`;
+                
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 4000); // Clean up after it falls
+            }, 150); // Spawns a new heart every 150ms
+        }
+
         yesBtn.addEventListener('click', () => {
-            question.style.display = 'none';
-            btnContainer.style.display = 'none';
+            mainScreen.style.display = 'none';
             successMessage.style.display = 'block';
+            
+            // Show how many times she tried to dodge
+            if (noCount === 0) {
+                noCountDisplay.innerText = "You clicked Yes on the first try! Perfect! 🥰";
+            } else {
+                noCountDisplay.innerText = `Haha, you tried to click 'No' ${noCount} times before giving up! 😂`;
+            }
+
+            // Start the celebration!
+            spawnHearts();
         });
     </script>
 
