@@ -193,7 +193,7 @@
     <!-- 1. The Secret Gatekeeper Screen -->
     <div id="auth-screen">
         <h2>Hold on! 🛑</h2>
-        <p>What exactly do you call me when I do something really dumb? (Only my bayko know)</p>
+        <p>What exactly do you call me when I do something really dumb?</p>
         
         <input type="text" id="secret-answer" placeholder="Type answer here...">
         <br>
@@ -229,8 +229,8 @@
 
     <script>
         // --- AUTHENTICATION LOGIC ---
-        // REPLACE "your_nickname_here" WITH THE ACTUAL NICKNAME (keep it all lowercase)
-        const CORRECT_ANSWER = "box"; 
+        // Array of accepted answers
+        const CORRECT_ANSWERS = ["box", "box fellow"]; 
 
         const authBtn = document.getElementById('auth-btn');
         const authInput = document.getElementById('secret-answer');
@@ -240,8 +240,11 @@
         const bgMusic = document.getElementById('bg-music');
 
         authBtn.addEventListener('click', () => {
+            // Trim spaces and convert to lowercase for easy matching
             const userAnswer = authInput.value.trim().toLowerCase();
-            if (userAnswer === CORRECT_ANSWER) {
+            
+            // Check if the typed answer is in our list of CORRECT_ANSWERS
+            if (CORRECT_ANSWERS.includes(userAnswer)) {
                 authScreen.style.display = 'none';
                 mainScreen.style.display = 'flex';
                 
@@ -372,5 +375,4 @@
         });
     </script>
 </body>
-    </html>
-    
+</html>
