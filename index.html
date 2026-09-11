@@ -62,7 +62,7 @@
 
         /* Main Game Styles */
         #main-screen {
-            display: none; /* Hidden until correct answer */
+            display: none; 
             flex-direction: column;
             align-items: center;
         }
@@ -134,20 +134,57 @@
         .emoji {
             position: absolute;
             font-size: 2rem;
-            pointer-events: none; /* So they don't block clicks */
+            pointer-events: none; 
             z-index: 5;
         }
 
-        /* Sad Emoji Animation */
         @keyframes floatUpFade {
             0% { transform: translateY(0) scale(1); opacity: 1; }
             100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
         }
 
-        /* Heart Drop Animation */
         @keyframes dropDown {
             0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Surprise Pop-up Styles */
+        #surprise-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(255, 77, 77, 0.6);
+            text-align: center;
+            z-index: 9999;
+            font-size: 2.2rem;
+            color: #d32f2f;
+            font-weight: bold;
+            border: 4px solid #ff4d4d;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .firecracker {
+            position: absolute;
+            font-size: 4rem;
+            animation: explode 0.8s ease-out forwards;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
     </style>
 </head>
@@ -156,8 +193,7 @@
     <!-- 1. The Secret Gatekeeper Screen -->
     <div id="auth-screen">
         <h2>Hold on! 🛑</h2>
-        <!-- CHANGE YOUR QUESTION HERE -->
-        <p>What is my favorite nickname for you? (Only my bayko knows this!)</p>
+        <p>What exactly do you call me when I do something really dumb?</p>
         
         <input type="text" id="secret-answer" placeholder="Type answer here...">
         <br>
@@ -181,27 +217,41 @@
         <div id="no-count-display"></div>
     </div>
 
+    <!-- Surprise Pop-up -->
+    <div id="surprise-popup">
+        🎇 Surprise for you is getting ready! 🎇
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bg-music" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         // --- AUTHENTICATION LOGIC ---
-        // CHANGE YOUR SECRET ANSWER HERE (Keep it in lowercase for the code to work easily)
-        const CORRECT_ANSWER = "pillu"; 
+        // REPLACE "your_nickname_here" WITH THE ACTUAL NICKNAME (keep it all lowercase)
+        const CORRECT_ANSWER = "your_nickname_here"; 
 
         const authBtn = document.getElementById('auth-btn');
         const authInput = document.getElementById('secret-answer');
         const authError = document.getElementById('auth-error');
         const authScreen = document.getElementById('auth-screen');
         const mainScreen = document.getElementById('main-screen');
+        const bgMusic = document.getElementById('bg-music');
 
         authBtn.addEventListener('click', () => {
             const userAnswer = authInput.value.trim().toLowerCase();
             if (userAnswer === CORRECT_ANSWER) {
                 authScreen.style.display = 'none';
                 mainScreen.style.display = 'flex';
+                
+                bgMusic.play().catch(error => {
+                    console.log("Browser blocked audio, user must click first.");
+                });
             } else {
                 authError.style.display = 'block';
             }
         });
-
 
         // --- GAME LOGIC ---
         const noBtn = document.getElementById('no-btn');
@@ -210,9 +260,10 @@
         const btnContainer = document.getElementById('btn-container');
         const successMessage = document.getElementById('success-message');
         const noCountDisplay = document.getElementById('no-count-display');
+        const surprisePopup = document.getElementById('surprise-popup');
         
         let yesScale = 1; 
-        let noCount = 0; // Tracks how many times she clicked/hovered on No
+        let noCount = 0; 
 
         function createSadEmoji(x, y) {
             const emojis = ['😢', '😭', '💔', '🥺'];
@@ -227,16 +278,14 @@
             
             document.body.appendChild(emojiEl);
 
-            // Remove it from the screen after 2 seconds
             setTimeout(() => {
                 emojiEl.remove();
             }, 2000);
         }
 
         function dodgeButton(event) {
-            noCount++; // Increase the count
+            noCount++; 
 
-            // Get current position of the No button to spawn sad emojis there
             const rect = noBtn.getBoundingClientRect();
             createSadEmoji(rect.left + 20, rect.top);
 
@@ -263,7 +312,7 @@
             dodgeButton();
         });
 
-        // --- SUCCESS LOGIC (Hearts & Message) ---
+        // --- SUCCESS LOGIC (Hearts, Message & Pop-up) ---
         function spawnHearts() {
             setInterval(() => {
                 const heart = document.createElement('div');
@@ -271,32 +320,57 @@
                 heart.innerText = '❤️';
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.top = '-50px';
-                heart.style.fontSize = (Math.random() * 20 + 20) + 'px'; // Random sizes
+                heart.style.fontSize = (Math.random() * 20 + 20) + 'px'; 
                 heart.style.animation = `dropDown ${Math.random() * 2 + 2}s linear forwards`;
                 
                 document.body.appendChild(heart);
 
                 setTimeout(() => {
                     heart.remove();
-                }, 4000); // Clean up after it falls
-            }, 150); // Spawns a new heart every 150ms
+                }, 4000); 
+            }, 150); 
+        }
+
+        function spawnFirecrackers() {
+            const crackers = ['🎆', '🎇', '🎉', '✨'];
+            for(let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const cracker = document.createElement('div');
+                    cracker.classList.add('firecracker');
+                    cracker.innerText = crackers[Math.floor(Math.random() * crackers.length)];
+                    cracker.style.left = Math.random() * 100 + 'vw';
+                    cracker.style.top = Math.random() * 100 + 'vh';
+                    document.body.appendChild(cracker);
+                    
+                    setTimeout(() => cracker.remove(), 800);
+                }, i * 150); 
+            }
         }
 
         yesBtn.addEventListener('click', () => {
             mainScreen.style.display = 'none';
             successMessage.style.display = 'block';
             
-            // Show how many times she tried to dodge
             if (noCount === 0) {
                 noCountDisplay.innerText = "You clicked Yes on the first try! Perfect! 🥰";
             } else {
                 noCountDisplay.innerText = `Haha, you tried to click 'No' ${noCount} times before giving up! 😂`;
             }
 
-            // Start the celebration!
             spawnHearts();
+
+            // Date Restriction: September 11, 2026
+            const currentDate = new Date();
+            const isToday = (currentDate.getFullYear() === 2026 && currentDate.getMonth() === 8 && currentDate.getDate() === 11);
+
+            if (isToday) {
+                setTimeout(() => {
+                    surprisePopup.style.display = 'block';
+                    spawnFirecrackers();
+                }, 2000);
+            }
         });
     </script>
-
 </body>
-</html>
+    </html>
+    
