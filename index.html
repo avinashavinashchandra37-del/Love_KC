@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Official Love Application 💌</title>
+    <title>The Bayko Scavenger Hunt 🗺️❤️</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #fdf2f8; /* Soft pastel pink */
+            background-color: #fdf2f8; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,7 +16,7 @@
             overflow-x: hidden;
         }
 
-        .form-container {
+        .container {
             background: white;
             padding: 35px 30px;
             border-radius: 15px;
@@ -25,34 +25,25 @@
             width: 90%;
             position: relative;
             z-index: 10;
+            text-align: center;
         }
 
         h1 {
             color: #db2777;
-            text-align: center;
             font-size: 1.8rem;
             margin-top: 0;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
-        p.subtitle {
-            text-align: center;
-            color: #6b7280;
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-            font-style: italic;
-        }
-
-        .question {
-            margin-bottom: 20px;
-        }
-
-        label.q-title {
-            font-weight: bold;
+        .clue-text {
+            font-size: 1.1rem;
             color: #374151;
-            display: block;
-            margin-bottom: 8px;
-            font-size: 1rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            background: #fdf2f8;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #db2777;
         }
 
         input[type="text"], select {
@@ -64,10 +55,62 @@
             font-size: 1rem;
             outline: none;
             transition: border-color 0.3s;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
         input[type="text"]:focus, select:focus {
             border-color: #db2777;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #db2777;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.1s, background 0.3s;
+            box-shadow: 0 4px 10px rgba(219, 39, 119, 0.3);
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn:hover {
+            background-color: #be185d;
+        }
+
+        .error-msg {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* Hide sections initially */
+        #hunt-2, #hunt-3, #form-box, #success-screen {
+            display: none;
+        }
+
+        /* Application Form Specific Styles */
+        .question {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label.q-title {
+            font-weight: bold;
+            color: #374151;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
         }
 
         .radio-group {
@@ -87,43 +130,16 @@
             cursor: pointer;
             border: 1px solid transparent;
             transition: border 0.2s;
+            text-align: left;
         }
 
         .radio-label:hover {
             border: 1px solid #fbcfe8;
         }
 
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #db2777;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: transform 0.1s, background 0.3s;
-            box-shadow: 0 4px 10px rgba(219, 39, 119, 0.3);
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
-        }
-
-        .submit-btn:hover {
-            background-color: #be185d;
-        }
-        
         /* Success Screen Styles */
-        #success-screen {
-            display: none;
-            text-align: center;
-        }
-
         .stamp {
-            color: #16a34a; /* Green */
+            color: #16a34a; 
             font-size: 3rem;
             font-weight: bold;
             border: 6px solid #16a34a;
@@ -135,7 +151,6 @@
             margin: 30px 0;
         }
 
-        /* The animation for the big APPROVED stamp */
         .stamp.animate {
             animation: stampIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -145,7 +160,6 @@
             100% { transform: rotate(-15deg) scale(1); opacity: 1; }
         }
 
-        /* Floating Hearts */
         .floating-heart {
             position: fixed;
             font-size: 2rem;
@@ -162,10 +176,43 @@
 </head>
 <body>
 
-    <!-- THE FORM SCREEN -->
-    <div class="form-container" id="form-box">
+    <!-- SCAVENGER HUNT STEP 1 -->
+    <div class="container" id="hunt-1">
+        <h1>Clue #1 🕵️‍♀️</h1>
+        <div class="clue-text">
+            Let's see how smart you are! Go to the spot where I keep my favorite white sneakers and tan suede loafers. You will find your first secret passcode hidden there.
+        </div>
+        <input type="text" id="ans-1" placeholder="Enter the secret word...">
+        <div class="error-msg" id="err-1">Nope! Keep looking!</div>
+        <button class="action-btn" onclick="checkAnswer(1, 'shoes')">Verify & Next ➡️</button>
+    </div>
+
+    <!-- SCAVENGER HUNT STEP 2 -->
+    <div class="container" id="hunt-2">
+        <h1>Clue #2 🍗</h1>
+        <div class="clue-text">
+            Good job! Now, I need my protein. Head to the kitchen and check exactly where we keep the eggs and chicken for my muscle-building meals.
+        </div>
+        <input type="text" id="ans-2" placeholder="Enter the second secret word...">
+        <div class="error-msg" id="err-2">Wrong passcode! Look closer.</div>
+        <button class="action-btn" onclick="checkAnswer(2, 'gains')">Verify & Next ➡️</button>
+    </div>
+
+    <!-- SCAVENGER HUNT STEP 3 -->
+    <div class="container" id="hunt-3">
+        <h1>Clue #3 🚗</h1>
+        <div class="clue-text">
+            Almost there! Think back to our awesome road trip to Indore. Go find the place in the house where I keep the keys to our ride.
+        </div>
+        <input type="text" id="ans-3" placeholder="Enter the final secret word...">
+        <div class="error-msg" id="err-3">That's not it!</div>
+        <button class="action-btn" onclick="checkAnswer(3, 'drive')">Unlock Application 🔓</button>
+    </div>
+
+    <!-- THE LOVE APPLICATION FORM -->
+    <div class="container" id="form-box">
         <h1>Official Love Application 📝❤️</h1>
-        <p class="subtitle">Please fill out accurately for lifetime consideration.</p>
+        <p style="color: #6b7280; font-style: italic; margin-bottom: 20px;">You cracked all the clues! Now fill this out for lifetime consideration.</p>
         
         <form id="love-form">
             <div class="question">
@@ -207,16 +254,14 @@
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn">Submit Application 💌</button>
+            <button type="submit" class="action-btn">Submit Application 💌</button>
         </form>
     </div>
 
     <!-- THE SUCCESS SCREEN -->
-    <div class="form-container" id="success-screen">
+    <div class="container" id="success-screen">
         <h1>Application Status</h1>
-        
         <div class="stamp" id="approved-stamp">APPROVED ✅</div>
-        
         <p style="font-size: 1.2rem; color: #374151; font-weight: bold;" id="applicant-display">
             Congratulations!
         </p>
@@ -226,6 +271,30 @@
     </div>
 
     <script>
+        // --- SCAVENGER HUNT LOGIC ---
+        function checkAnswer(stepNumber, correctAnswer) {
+            const inputField = document.getElementById(`ans-${stepNumber}`);
+            const errorMsg = document.getElementById(`err-${stepNumber}`);
+            const currentScreen = document.getElementById(`hunt-${stepNumber}`);
+            
+            // Determine the next screen to show
+            let nextScreen;
+            if (stepNumber === 1) nextScreen = document.getElementById('hunt-2');
+            else if (stepNumber === 2) nextScreen = document.getElementById('hunt-3');
+            else if (stepNumber === 3) nextScreen = document.getElementById('form-box');
+
+            // Format what she typed (lowercase, remove extra spaces)
+            const userAnswer = inputField.value.trim().toLowerCase();
+
+            if (userAnswer === correctAnswer) {
+                currentScreen.style.display = 'none';
+                nextScreen.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // --- APPLICATION FORM LOGIC ---
         const form = document.getElementById('love-form');
         const formBox = document.getElementById('form-box');
         const successScreen = document.getElementById('success-screen');
@@ -234,7 +303,6 @@
         const nameInput = document.getElementById('name');
 
         function spawnHearts() {
-            // Create 30 floating hearts from the bottom of the screen
             for(let i = 0; i < 30; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
@@ -242,32 +310,22 @@
                     heart.innerText = ['❤️', '💖', '🥰', '✨'][Math.floor(Math.random() * 4)];
                     heart.style.left = Math.random() * 100 + 'vw';
                     heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
-                    
-                    // Randomize animation speed a bit
                     heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
                     
                     document.body.appendChild(heart);
-                    
-                    // Clean up the DOM after animation finishes
                     setTimeout(() => heart.remove(), 5000);
-                }, i * 150); // Stagger them
+                }, i * 150); 
             }
         }
 
         form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevents the page from reloading
-
-            // Get her name
+            e.preventDefault(); 
             const applicantName = nameInput.value.trim();
 
-            // Hide the form, show the success screen
             formBox.style.display = 'none';
             successScreen.style.display = 'block';
-
-            // Personalize the success text
             applicantDisplay.innerText = `Congratulations, ${applicantName}!`;
 
-            // Trigger the animations
             setTimeout(() => {
                 stamp.classList.add('animate');
             }, 100);
