@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Love Application 💌</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fdf2f8; /* Soft pastel pink */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .form-container {
+            background: white;
+            padding: 35px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(219, 39, 119, 0.15);
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #db2777;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        label.q-title {
+            font-weight: bold;
+            color: #374151;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #fbcfe8;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: #db2777;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fdf2f8;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: border 0.2s;
+        }
+
+        .radio-label:hover {
+            border: 1px solid #fbcfe8;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #db2777;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.1s, background 0.3s;
+            box-shadow: 0 4px 10px rgba(219, 39, 119, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .submit-btn:hover {
+            background-color: #be185d;
+        }
+        
+        /* Success Screen Styles */
+        #success-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .stamp {
+            color: #16a34a; /* Green */
+            font-size: 3rem;
+            font-weight: bold;
+            border: 6px solid #16a34a;
+            padding: 10px 25px;
+            border-radius: 12px;
+            display: inline-block;
+            transform: rotate(-15deg) scale(3);
+            opacity: 0;
+            margin: 30px 0;
+        }
+
+        /* The animation for the big APPROVED stamp */
+        .stamp.animate {
+            animation: stampIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes stampIn {
+            0% { transform: rotate(-15deg) scale(3); opacity: 0; }
+            100% { transform: rotate(-15deg) scale(1); opacity: 1; }
+        }
+
+        /* Floating Hearts */
+        .floating-heart {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 5;
+            animation: floatUp 4s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- THE FORM SCREEN -->
+    <div class="form-container" id="form-box">
+        <h1>Official Love Application 📝❤️</h1>
+        <p class="subtitle">Please fill out accurately for lifetime consideration.</p>
+        
+        <form id="love-form">
+            <div class="question">
+                <label class="q-title">1. Applicant Name:</label>
+                <input type="text" id="name" placeholder="Enter your cute name..." required>
+            </div>
+
+            <div class="question">
+                <label class="q-title">2. Position Applying For:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="position" required> Full-Time Bayko
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="position"> Chief of My Heart
+                    </label>
+                </div>
+            </div>
+
+            <div class="question">
+                <label class="q-title">3. When I do something really dumb, you promise to call me:</label>
+                <select required>
+                    <option value="">-- Select your weapon --</option>
+                    <option value="box">Box</option>
+                    <option value="box_fellow">Box Fellow</option>
+                    <option value="both">Both, depending on how dumb it is</option>
+                </select>
+            </div>
+
+            <div class="question">
+                <label class="q-title">4. Will you put up with my nonsense forever?</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="nonsense" required> Yes, obviously.
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="nonsense"> Yes, but with heavy eye rolls.
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Application 💌</button>
+        </form>
+    </div>
+
+    <!-- THE SUCCESS SCREEN -->
+    <div class="form-container" id="success-screen">
+        <h1>Application Status</h1>
+        
+        <div class="stamp" id="approved-stamp">APPROVED ✅</div>
+        
+        <p style="font-size: 1.2rem; color: #374151; font-weight: bold;" id="applicant-display">
+            Congratulations!
+        </p>
+        <p style="font-size: 1rem; color: #db2777; margin-top: 15px;">
+            Your application has been permanently accepted by Avinash. Lifetime subscription activated! 🥰
+        </p>
+    </div>
+
+    <script>
+        const form = document.getElementById('love-form');
+        const formBox = document.getElementById('form-box');
+        const successScreen = document.getElementById('success-screen');
+        const applicantDisplay = document.getElementById('applicant-display');
+        const stamp = document.getElementById('approved-stamp');
+        const nameInput = document.getElementById('name');
+
+        function spawnHearts() {
+            // Create 30 floating hearts from the bottom of the screen
+            for(let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('floating-heart');
+                    heart.innerText = ['❤️', '💖', '🥰', '✨'][Math.floor(Math.random() * 4)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                    
+                    // Randomize animation speed a bit
+                    heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                    
+                    document.body.appendChild(heart);
+                    
+                    // Clean up the DOM after animation finishes
+                    setTimeout(() => heart.remove(), 5000);
+                }, i * 150); // Stagger them
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevents the page from reloading
+
+            // Get her name
+            const applicantName = nameInput.value.trim();
+
+            // Hide the form, show the success screen
+            formBox.style.display = 'none';
+            successScreen.style.display = 'block';
+
+            // Personalize the success text
+            applicantDisplay.innerText = `Congratulations, ${applicantName}!`;
+
+            // Trigger the animations
+            setTimeout(() => {
+                stamp.classList.add('animate');
+            }, 100);
+            
+            spawnHearts();
+        });
+    </script>
+</body>
+</html>
