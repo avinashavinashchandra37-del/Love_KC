@@ -94,8 +94,8 @@
             font-weight: bold;
         }
 
-        /* Hide sections initially */
-        #hunt-2, #hunt-3, #form-box, #success-screen {
+        /* Hide sections initially except the first one */
+        #hunt-2, #hunt-3, #hunt-4, #hunt-5, #hunt-6, #hunt-7, #form-box, #success-screen {
             display: none;
         }
 
@@ -189,11 +189,11 @@
 
     <!-- SCAVENGER HUNT STEP 2 -->
     <div class="container" id="hunt-2">
-        <h1>Clue #2 🍗</h1>
+        <h1>Clue #2 💪</h1>
         <div class="clue-text">
-            Good job! Now, I need my protein. Head to the kitchen and check exactly where we keep the eggs and chicken for my muscle-building meals.
+            Good job! Now, I need my protein. Head to the kitchen and check exactly where we keep the eggs, milk, and curd for my muscle-building meals.
         </div>
-        <input type="text" id="ans-2" placeholder="Enter the second secret word...">
+        <input type="text" id="ans-2" placeholder="Enter the secret word...">
         <div class="error-msg" id="err-2">Wrong passcode! Look closer.</div>
         <button class="action-btn" onclick="checkAnswer(2, 'gains')">Verify & Next ➡️</button>
     </div>
@@ -202,17 +202,61 @@
     <div class="container" id="hunt-3">
         <h1>Clue #3 🚗</h1>
         <div class="clue-text">
-            Almost there! Think back to our awesome road trip to Indore. Go find the place in the house where I keep the keys to our ride.
+            Awesome! Think back to our road trip to Indore. Go find the place in the house where I keep the keys to our ride.
         </div>
-        <input type="text" id="ans-3" placeholder="Enter the final secret word...">
+        <input type="text" id="ans-3" placeholder="Enter the secret word...">
         <div class="error-msg" id="err-3">That's not it!</div>
-        <button class="action-btn" onclick="checkAnswer(3, 'drive')">Unlock Application 🔓</button>
+        <button class="action-btn" onclick="checkAnswer(3, 'drive')">Verify & Next ➡️</button>
+    </div>
+
+    <!-- SCAVENGER HUNT STEP 4 -->
+    <div class="container" id="hunt-4">
+        <h1>Clue #4 ✨</h1>
+        <div class="clue-text">
+            Think back to the very first time we met. Even though we weren't officially on a date, I definitely noticed your perfume. Go check where you keep your Bella Vita 'Date' perfume!
+        </div>
+        <input type="text" id="ans-4" placeholder="Enter the secret word...">
+        <div class="error-msg" id="err-4">Try again, beautiful!</div>
+        <button class="action-btn" onclick="checkAnswer(4, 'date')">Verify & Next ➡️</button>
+    </div>
+
+    <!-- SCAVENGER HUNT STEP 5 -->
+    <div class="container" id="hunt-5">
+        <h1>Clue #5 👜</h1>
+        <div class="clue-text">
+            You definitely have a type... and it requires a whole dedicated cupboard! Go look where you keep all your precious bags, especially your favorite Gucci ones.
+        </div>
+        <input type="text" id="ans-5" placeholder="Enter the secret word...">
+        <div class="error-msg" id="err-5">Not quite! Check the bags again.</div>
+        <button class="action-btn" onclick="checkAnswer(5, 'gucci')">Verify & Next ➡️</button>
+    </div>
+
+    <!-- SCAVENGER HUNT STEP 6 -->
+    <div class="container" id="hunt-6">
+        <h1>Clue #6 🦄</h1>
+        <div class="clue-text">
+            My little unicorn paglu! You love them so much that we even have a giant one. Go ask 'Uunty' for the next secret word!
+        </div>
+        <input type="text" id="ans-6" placeholder="Enter the secret word...">
+        <div class="error-msg" id="err-6">Uunty says that's wrong!</div>
+        <button class="action-btn" onclick="checkAnswer(6, 'uunty')">Verify & Next ➡️</button>
+    </div>
+
+    <!-- SCAVENGER HUNT STEP 7 -->
+    <div class="container" id="hunt-7">
+        <h1>Clue #7 💫</h1>
+        <div class="clue-text">
+            Last clue! You recently added some beautiful Kashmiri ones to your collection. Go check your two bangle boxes for the final passcode.
+        </div>
+        <input type="text" id="ans-7" placeholder="Enter the final secret word...">
+        <div class="error-msg" id="err-7">Almost there! Try again.</div>
+        <button class="action-btn" onclick="checkAnswer(7, 'bangles')">Unlock Application 🔓</button>
     </div>
 
     <!-- THE LOVE APPLICATION FORM -->
     <div class="container" id="form-box">
         <h1>Official Love Application 📝❤️</h1>
-        <p style="color: #6b7280; font-style: italic; margin-bottom: 20px;">You cracked all the clues! Now fill this out for lifetime consideration.</p>
+        <p style="color: #6b7280; font-style: italic; margin-bottom: 20px;">You cracked all 7 clues! Now fill this out for lifetime consideration.</p>
         
         <form id="love-form">
             <div class="question">
@@ -277,11 +321,13 @@
             const errorMsg = document.getElementById(`err-${stepNumber}`);
             const currentScreen = document.getElementById(`hunt-${stepNumber}`);
             
-            // Determine the next screen to show
+            // Determine the next screen to show (if it's step 7, next is form-box)
             let nextScreen;
-            if (stepNumber === 1) nextScreen = document.getElementById('hunt-2');
-            else if (stepNumber === 2) nextScreen = document.getElementById('hunt-3');
-            else if (stepNumber === 3) nextScreen = document.getElementById('form-box');
+            if (stepNumber < 7) {
+                nextScreen = document.getElementById(`hunt-${stepNumber + 1}`);
+            } else {
+                nextScreen = document.getElementById('form-box');
+            }
 
             // Format what she typed (lowercase, remove extra spaces)
             const userAnswer = inputField.value.trim().toLowerCase();
@@ -303,11 +349,12 @@
         const nameInput = document.getElementById('name');
 
         function spawnHearts() {
-            for(let i = 0; i < 30; i++) {
+            for(let i = 0; i < 40; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.classList.add('floating-heart');
-                    heart.innerText = ['❤️', '💖', '🥰', '✨'][Math.floor(Math.random() * 4)];
+                    // Adding a unicorn emoji to the mix just for her!
+                    heart.innerText = ['❤️', '💖', '🥰', '✨', '🦄'][Math.floor(Math.random() * 5)];
                     heart.style.left = Math.random() * 100 + 'vw';
                     heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
                     heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
@@ -330,7 +377,7 @@
                 stamp.classList.add('animate');
             }, 100);
             
-            spawnHearts();
+            spawnHearts(); // I added a unicorn emoji to the floating hearts array here!
         });
     </script>
 </body>
