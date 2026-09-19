@@ -26,6 +26,7 @@
             position: relative;
             z-index: 10;
             text-align: center;
+            margin: 20px 0;
         }
 
         h1 {
@@ -38,7 +39,7 @@
         .clue-text {
             font-size: 1.1rem;
             color: #374151;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             line-height: 1.5;
             background: #fdf2f8;
             padding: 15px;
@@ -78,96 +79,95 @@
             box-shadow: 0 4px 10px rgba(219, 39, 119, 0.3);
         }
 
-        .action-btn:active {
-            transform: scale(0.98);
-        }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:hover { background-color: #be185d; }
 
-        .action-btn:hover {
-            background-color: #be185d;
+        .hint-btn {
+            background-color: #fbcfe8;
+            color: #be185d;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
         }
 
         .error-msg {
             color: red;
             font-size: 0.9rem;
-            margin-top: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
             display: none;
             font-weight: bold;
         }
 
-        /* Hide sections initially except the first one */
-        #hunt-2, #hunt-3, #hunt-4, #hunt-5, #hunt-6, #hunt-7, #form-box, #success-screen {
+        /* Scratch Card Styles */
+        #hint-section {
             display: none;
-        }
-
-        /* Application Form Specific Styles */
-        .question {
             margin-bottom: 20px;
-            text-align: left;
         }
-
-        label.q-title {
-            font-weight: bold;
-            color: #374151;
-            display: block;
-            margin-bottom: 8px;
-            font-size: 1rem;
+        .scratch-container {
+            position: relative;
+            width: 100%;
+            height: 80px;
+            background: #fff;
+            border: 2px dashed #fbcfe8;
+            border-radius: 8px;
+            overflow: hidden;
         }
-
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .radio-label {
-            font-weight: normal;
+        .hint-secret-text {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: #fdf2f8;
+            justify-content: center;
+            text-align: center;
             padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: border 0.2s;
-            text-align: left;
-        }
-
-        .radio-label:hover {
-            border: 1px solid #fbcfe8;
-        }
-
-        /* Success Screen Styles */
-        .stamp {
-            color: #16a34a; 
-            font-size: 3rem;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            color: #be185d;
             font-weight: bold;
-            border: 6px solid #16a34a;
-            padding: 10px 25px;
-            border-radius: 12px;
-            display: inline-block;
-            transform: rotate(-15deg) scale(3);
-            opacity: 0;
-            margin: 30px 0;
+        }
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2;
+            touch-action: none; /* Prevents screen scrolling while scratching */
+            cursor: crosshair;
         }
 
-        .stamp.animate {
-            animation: stampIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        /* Hide sections initially */
+        #form-screen, #success-screen { display: none; }
 
+        /* Form Styles */
+        .question { margin-bottom: 20px; text-align: left; }
+        label.q-title { font-weight: bold; color: #374151; display: block; margin-bottom: 8px; font-size: 1rem; }
+        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+        .radio-label {
+            font-weight: normal; display: flex; align-items: center; gap: 8px;
+            background: #fdf2f8; padding: 10px; border-radius: 8px;
+            cursor: pointer; border: 1px solid transparent; transition: border 0.2s; text-align: left;
+        }
+        .radio-label:hover { border: 1px solid #fbcfe8; }
+
+        /* Success Screen */
+        .stamp {
+            color: #16a34a; font-size: 3rem; font-weight: bold; border: 6px solid #16a34a;
+            padding: 10px 25px; border-radius: 12px; display: inline-block;
+            transform: rotate(-15deg) scale(3); opacity: 0; margin: 30px 0;
+        }
+        .stamp.animate { animation: stampIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes stampIn {
             0% { transform: rotate(-15deg) scale(3); opacity: 0; }
             100% { transform: rotate(-15deg) scale(1); opacity: 1; }
         }
-
         .floating-heart {
-            position: fixed;
-            font-size: 2rem;
-            pointer-events: none;
-            z-index: 5;
+            position: fixed; font-size: 2rem; pointer-events: none; z-index: 5;
             animation: floatUp 4s linear forwards;
         }
-
         @keyframes floatUp {
             0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
@@ -176,106 +176,41 @@
 </head>
 <body>
 
-    <!-- SCAVENGER HUNT STEP 1 -->
-    <div class="container" id="hunt-1">
-        <h1>Clue #1 🕵️‍♀️</h1>
-        <div class="clue-text">
-            Let's see how smart you are! Go to the spot where I keep my favorite white sneakers and tan suede loafers. You will find your first secret passcode hidden there.
+    <div class="container" id="hunt-screen">
+        <h1 id="clue-title">Clue #1 🕵️‍♀️</h1>
+        <div class="clue-text" id="clue-desc">Loading clue...</div>
+
+        <button class="hint-btn" id="show-hint-btn" onclick="revealHintArea()">Need a Hint? 💡</button>
+        
+        <div id="hint-section">
+            <p style="font-size:0.85rem; color:#6b7280; margin-top:0; margin-bottom:5px;">Scratch the silver card below! 🪙</p>
+            <div class="scratch-container">
+                <div id="hint-secret-text" class="hint-secret-text">Hidden Hint</div>
+                <canvas id="scratch-canvas"></canvas>
+            </div>
         </div>
-        <input type="text" id="ans-1" placeholder="Enter the secret word...">
-        <div class="error-msg" id="err-1">Nope! Keep looking!</div>
-        <button class="action-btn" onclick="checkAnswer(1, 'shoes')">Verify & Next ➡️</button>
+
+        <input type="text" id="hunt-ans" placeholder="Enter the secret word...">
+        <div class="error-msg" id="hunt-err">Nope! Keep looking!</div>
+        <button class="action-btn" onclick="checkAnswer()">Verify & Next ➡️</button>
     </div>
 
-    <!-- SCAVENGER HUNT STEP 2 -->
-    <div class="container" id="hunt-2">
-        <h1>Clue #2 💪</h1>
-        <div class="clue-text">
-            Good job! Now, I need my protein. Head to the kitchen and check exactly where we keep the eggs, milk, and curd for my muscle-building meals.
-        </div>
-        <input type="text" id="ans-2" placeholder="Enter the secret word...">
-        <div class="error-msg" id="err-2">Wrong passcode! Look closer.</div>
-        <button class="action-btn" onclick="checkAnswer(2, 'gains')">Verify & Next ➡️</button>
-    </div>
-
-    <!-- SCAVENGER HUNT STEP 3 -->
-    <div class="container" id="hunt-3">
-        <h1>Clue #3 🚗</h1>
-        <div class="clue-text">
-            Awesome! Think back to our road trip to Indore. Go find the place in the house where I keep the keys to our ride.
-        </div>
-        <input type="text" id="ans-3" placeholder="Enter the secret word...">
-        <div class="error-msg" id="err-3">That's not it!</div>
-        <button class="action-btn" onclick="checkAnswer(3, 'drive')">Verify & Next ➡️</button>
-    </div>
-
-    <!-- SCAVENGER HUNT STEP 4 -->
-    <div class="container" id="hunt-4">
-        <h1>Clue #4 ✨</h1>
-        <div class="clue-text">
-            Think back to the very first time we met. Even though we weren't officially on a date, I definitely noticed your perfume. Go check where you keep your Bella Vita 'Date' perfume!
-        </div>
-        <input type="text" id="ans-4" placeholder="Enter the secret word...">
-        <div class="error-msg" id="err-4">Try again, beautiful!</div>
-        <button class="action-btn" onclick="checkAnswer(4, 'date')">Verify & Next ➡️</button>
-    </div>
-
-    <!-- SCAVENGER HUNT STEP 5 -->
-    <div class="container" id="hunt-5">
-        <h1>Clue #5 👜</h1>
-        <div class="clue-text">
-            You definitely have a type... and it requires a whole dedicated cupboard! Go look where you keep all your precious bags, especially your favorite Gucci ones.
-        </div>
-        <input type="text" id="ans-5" placeholder="Enter the secret word...">
-        <div class="error-msg" id="err-5">Not quite! Check the bags again.</div>
-        <button class="action-btn" onclick="checkAnswer(5, 'gucci')">Verify & Next ➡️</button>
-    </div>
-
-    <!-- SCAVENGER HUNT STEP 6 -->
-    <div class="container" id="hunt-6">
-        <h1>Clue #6 🦄</h1>
-        <div class="clue-text">
-            My little unicorn paglu! You love them so much that we even have a giant one. Go ask 'Uunty' for the next secret word!
-        </div>
-        <input type="text" id="ans-6" placeholder="Enter the secret word...">
-        <div class="error-msg" id="err-6">Uunty says that's wrong!</div>
-        <button class="action-btn" onclick="checkAnswer(6, 'uunty')">Verify & Next ➡️</button>
-    </div>
-
-    <!-- SCAVENGER HUNT STEP 7 -->
-    <div class="container" id="hunt-7">
-        <h1>Clue #7 💫</h1>
-        <div class="clue-text">
-            Last clue! You recently added some beautiful Kashmiri ones to your collection. Go check your two bangle boxes for the final passcode.
-        </div>
-        <input type="text" id="ans-7" placeholder="Enter the final secret word...">
-        <div class="error-msg" id="err-7">Almost there! Try again.</div>
-        <button class="action-btn" onclick="checkAnswer(7, 'bangles')">Unlock Application 🔓</button>
-    </div>
-
-    <!-- THE LOVE APPLICATION FORM -->
-    <div class="container" id="form-box">
+    <div class="container" id="form-screen">
         <h1>Official Love Application 📝❤️</h1>
-        <p style="color: #6b7280; font-style: italic; margin-bottom: 20px;">You cracked all 7 clues! Now fill this out for lifetime consideration.</p>
+        <p style="color: #6b7280; font-style: italic; margin-bottom: 20px;">You cracked all the clues! Now fill this out for lifetime consideration.</p>
         
         <form id="love-form">
             <div class="question">
                 <label class="q-title">1. Applicant Name:</label>
                 <input type="text" id="name" placeholder="Enter your cute name..." required>
             </div>
-
             <div class="question">
                 <label class="q-title">2. Position Applying For:</label>
                 <div class="radio-group">
-                    <label class="radio-label">
-                        <input type="radio" name="position" required> Full-Time Bayko
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="position"> Chief of My Heart
-                    </label>
+                    <label class="radio-label"><input type="radio" name="position" required> Full-Time Bayko</label>
+                    <label class="radio-label"><input type="radio" name="position"> Chief of My Heart</label>
                 </div>
             </div>
-
             <div class="question">
                 <label class="q-title">3. When I do something really dumb, you promise to call me:</label>
                 <select required>
@@ -285,80 +220,176 @@
                     <option value="both">Both, depending on how dumb it is</option>
                 </select>
             </div>
-
             <div class="question">
                 <label class="q-title">4. Will you put up with my nonsense forever?</label>
                 <div class="radio-group">
-                    <label class="radio-label">
-                        <input type="radio" name="nonsense" required> Yes, obviously.
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="nonsense"> Yes, but with heavy eye rolls.
-                    </label>
+                    <label class="radio-label"><input type="radio" name="nonsense" required> Yes, obviously.</label>
+                    <label class="radio-label"><input type="radio" name="nonsense"> Yes, but with heavy eye rolls.</label>
                 </div>
             </div>
-
             <button type="submit" class="action-btn">Submit Application 💌</button>
         </form>
     </div>
 
-    <!-- THE SUCCESS SCREEN -->
     <div class="container" id="success-screen">
         <h1>Application Status</h1>
         <div class="stamp" id="approved-stamp">APPROVED ✅</div>
-        <p style="font-size: 1.2rem; color: #374151; font-weight: bold;" id="applicant-display">
-            Congratulations!
-        </p>
+        <p style="font-size: 1.2rem; color: #374151; font-weight: bold;" id="applicant-display">Congratulations!</p>
         <p style="font-size: 1rem; color: #db2777; margin-top: 15px;">
             Your application has been permanently accepted by Avinash. Lifetime subscription activated! 🥰
         </p>
     </div>
 
     <script>
-        // --- SCAVENGER HUNT LOGIC ---
-        function checkAnswer(stepNumber, correctAnswer) {
-            const inputField = document.getElementById(`ans-${stepNumber}`);
-            const errorMsg = document.getElementById(`err-${stepNumber}`);
-            const currentScreen = document.getElementById(`hunt-${stepNumber}`);
-            
-            // Determine the next screen to show (if it's step 7, next is form-box)
-            let nextScreen;
-            if (stepNumber < 7) {
-                nextScreen = document.getElementById(`hunt-${stepNumber + 1}`);
-            } else {
-                nextScreen = document.getElementById('form-box');
-            }
+        // --- 1. CLUE DATA (Riddles + Hints) ---
+        const allClues = [
+            { icon: "👟", ans: "shoes", 
+              clue: "I take you to places, but I never move on my own. I have a tongue but cannot speak, and my favorites are white or tan.", 
+              hint: "Look near my white sneakers and tan suede loafers!" },
+            { icon: "💪", ans: "gains", 
+              clue: "I am the fuel for the muscles, kept where it's always winter. I come in shells, jugs, and tubs.", 
+              hint: "Check the fridge near the eggs, milk, and curd." },
+            { icon: "🚗", ans: "drive", 
+              clue: "I hold the power to take us to Indore again, but right now, I'm just hanging around.", 
+              hint: "Look exactly where we keep the car keys!" },
+            { icon: "✨", ans: "date", 
+              clue: "We weren't on one, but you smelled like one. A sweet memory trapped in a little bottle.", 
+              hint: "Check near your Bella Vita 'Date' perfume." },
+            { icon: "👜", ans: "gucci", 
+              clue: "I have my own dedicated house inside our house. I carry your things, and the favorites have two G's.", 
+              hint: "Look inside your dedicated bag cupboard (check the Gucci!)." },
+            { icon: "🦄", ans: "uunty", 
+              clue: "I am magical, huge, and I live with you. I might not be a real animal, but I have a highly respected status.", 
+              hint: "Ask your giant unicorn soft toy (Uunty)!" },
+            { icon: "💫", ans: "bangles", 
+              clue: "We jingle and jangle, a beautiful new Kashmiri addition to a double-boxed collection.", 
+              hint: "Check inside your two bangle boxes!" }
+        ];
 
-            // Format what she typed (lowercase, remove extra spaces)
-            const userAnswer = inputField.value.trim().toLowerCase();
+        // --- 2. SHUFFLE ARRAY & GAME STATE ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        shuffleArray(allClues);
+        let currentStep = 0;
+
+        // DOM Elements
+        const huntScreen = document.getElementById('hunt-screen');
+        const formScreen = document.getElementById('form-screen');
+        const clueTitle = document.getElementById('clue-title');
+        const clueDesc = document.getElementById('clue-desc');
+        const huntAns = document.getElementById('hunt-ans');
+        const huntErr = document.getElementById('hunt-err');
+        const hintSection = document.getElementById('hint-section');
+        const showHintBtn = document.getElementById('show-hint-btn');
+        const hintSecretText = document.getElementById('hint-secret-text');
+        
+        // Canvas Elements
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        // --- 3. LOAD CURRENT CLUE ---
+        function loadClue() {
+            const currentData = allClues[currentStep];
+            clueTitle.innerText = `Clue #${currentStep + 1} ${currentData.icon}`;
+            clueDesc.innerText = currentData.clue;
+            hintSecretText.innerText = currentData.hint;
+            
+            // Reset UI
+            huntAns.value = "";
+            huntErr.style.display = "none";
+            hintSection.style.display = "none";
+            showHintBtn.style.display = "inline-block";
+        }
+
+        // --- 4. SCRATCH CARD LOGIC ---
+        function revealHintArea() {
+            showHintBtn.style.display = "none";
+            hintSection.style.display = "block";
+            
+            // Setup canvas size and fill
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#d1d5db'; // Silver coating
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add scratch me text
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = '#6b7280';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('SCRATCH ME', canvas.width/2, canvas.height/2);
+        }
+
+        function scratch(e) {
+            if (!isDrawing) return;
+            e.preventDefault(); // Prevents screen scroll on mobile
+            
+            const rect = canvas.getBoundingClientRect();
+            let x, y;
+            if (e.type.includes('touch')) {
+                x = e.touches[0].clientX - rect.left;
+                y = e.touches[0].clientY - rect.top;
+            } else {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+            
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 18, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Canvas Events
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mousemove', scratch);
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
+        canvas.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('touchmove', scratch, {passive: false});
+
+
+        // --- 5. CHECK ANSWER & PROGRESS ---
+        function checkAnswer() {
+            const userAnswer = huntAns.value.trim().toLowerCase();
+            const correctAnswer = allClues[currentStep].ans;
 
             if (userAnswer === correctAnswer) {
-                currentScreen.style.display = 'none';
-                nextScreen.style.display = 'block';
+                currentStep++;
+                if (currentStep < allClues.length) {
+                    loadClue();
+                } else {
+                    huntScreen.style.display = 'none';
+                    formScreen.style.display = 'block';
+                }
             } else {
-                errorMsg.style.display = 'block';
+                huntErr.style.display = 'block';
             }
         }
 
-        // --- APPLICATION FORM LOGIC ---
+        // --- 6. SUBMIT FORM & HEARTS ---
         const form = document.getElementById('love-form');
-        const formBox = document.getElementById('form-box');
         const successScreen = document.getElementById('success-screen');
-        const applicantDisplay = document.getElementById('applicant-display');
         const stamp = document.getElementById('approved-stamp');
         const nameInput = document.getElementById('name');
+        const applicantDisplay = document.getElementById('applicant-display');
 
         function spawnHearts() {
             for(let i = 0; i < 40; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.classList.add('floating-heart');
-                    // Adding a unicorn emoji to the mix just for her!
                     heart.innerText = ['❤️', '💖', '🥰', '✨', '🦄'][Math.floor(Math.random() * 5)];
                     heart.style.left = Math.random() * 100 + 'vw';
                     heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
                     heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
-                    
                     document.body.appendChild(heart);
                     setTimeout(() => heart.remove(), 5000);
                 }, i * 150); 
@@ -368,17 +399,16 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault(); 
             const applicantName = nameInput.value.trim();
-
-            formBox.style.display = 'none';
+            formScreen.style.display = 'none';
             successScreen.style.display = 'block';
             applicantDisplay.innerText = `Congratulations, ${applicantName}!`;
 
-            setTimeout(() => {
-                stamp.classList.add('animate');
-            }, 100);
-            
-            spawnHearts(); // I added a unicorn emoji to the floating hearts array here!
+            setTimeout(() => { stamp.classList.add('animate'); }, 100);
+            spawnHearts(); 
         });
+
+        // Initialize the first clue on load
+        loadClue();
     </script>
 </body>
 </html>
