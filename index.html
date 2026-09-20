@@ -47,7 +47,7 @@
             border-left: 4px solid #db2777;
         }
 
-        input[type="text"], select {
+        input[type="text"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #fbcfe8;
@@ -60,7 +60,7 @@
             text-align: center;
         }
 
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus {
             border-color: #db2777;
         }
 
@@ -92,7 +92,7 @@
             cursor: pointer;
             margin-bottom: 15px;
             font-size: 0.9rem;
-            display: none; /* Hidden by default */
+            display: none; 
         }
 
         .error-msg {
@@ -104,7 +104,7 @@
             font-weight: bold;
         }
 
-        /* Screen Shake Animation for Wrong Answers */
+        /* Screen Shake Animation */
         .shake {
             animation: shake-animation 0.4s ease-in-out;
         }
@@ -154,18 +154,7 @@
         }
 
         /* Hide sections initially */
-        #form-screen, #success-screen { display: none; }
-
-        /* Form Styles */
-        .question { margin-bottom: 20px; text-align: left; }
-        label.q-title { font-weight: bold; color: #374151; display: block; margin-bottom: 8px; font-size: 1rem; }
-        .radio-group { display: flex; flex-direction: column; gap: 10px; }
-        .radio-label {
-            font-weight: normal; display: flex; align-items: center; gap: 8px;
-            background: #fdf2f8; padding: 10px; border-radius: 8px;
-            cursor: pointer; border: 1px solid transparent; transition: border 0.2s; text-align: left;
-        }
-        .radio-label:hover { border: 1px solid #fbcfe8; }
+        #success-screen { display: none; }
 
         /* Success Screen */
         .stamp {
@@ -210,50 +199,13 @@
         <button class="action-btn" onclick="checkAnswer()">Verify & Next ➡️</button>
     </div>
 
-    <!-- THE LOVE APPLICATION FORM -->
-    <div class="container" id="form-screen">
-        <h1>Official Love Application 📝❤️</h1>
-        <p style="color: #6b7280; font-style: italic; margin-bottom: 20px;">You cracked all the clues! Now fill this out for lifetime consideration.</p>
-        
-        <form id="love-form">
-            <div class="question">
-                <label class="q-title">1. Applicant Name:</label>
-                <input type="text" id="name" placeholder="Enter your cute name..." required>
-            </div>
-            <div class="question">
-                <label class="q-title">2. Position Applying For:</label>
-                <div class="radio-group">
-                    <label class="radio-label"><input type="radio" name="position" required> Full-Time Bayko</label>
-                    <label class="radio-label"><input type="radio" name="position"> Chief of My Heart</label>
-                </div>
-            </div>
-            <div class="question">
-                <label class="q-title">3. When I do something really dumb, you promise to call me:</label>
-                <select required>
-                    <option value="">-- Select your weapon --</option>
-                    <option value="box">Box</option>
-                    <option value="box_fellow">Box Fellow</option>
-                    <option value="both">Both, depending on how dumb it is</option>
-                </select>
-            </div>
-            <div class="question">
-                <label class="q-title">4. Will you put up with my nonsense forever?</label>
-                <div class="radio-group">
-                    <label class="radio-label"><input type="radio" name="nonsense" required> Yes, obviously.</label>
-                    <label class="radio-label"><input type="radio" name="nonsense"> Yes, but with heavy eye rolls.</label>
-                </div>
-            </div>
-            <button type="submit" class="action-btn">Submit Application 💌</button>
-        </form>
-    </div>
-
-    <!-- THE SUCCESS SCREEN -->
+    <!-- THE SUCCESS SCREEN (Appears immediately after last clue) -->
     <div class="container" id="success-screen">
-        <h1>Application Status</h1>
+        <h1>Hunt Completed!</h1>
         <div class="stamp" id="approved-stamp">APPROVED ✅</div>
-        <p style="font-size: 1.2rem; color: #374151; font-weight: bold;" id="applicant-display">Congratulations!</p>
+        <p style="font-size: 1.2rem; color: #374151; font-weight: bold;" id="applicant-display">Congratulations, my Bayko!</p>
         <p style="font-size: 1rem; color: #db2777; margin-top: 15px;">
-            Your application has been permanently accepted by Avinash. Lifetime subscription activated! 🥰
+            You have successfully completed the hunt. Lifetime subscription to Avinash activated! 🥰
         </p>
         <p style="font-size: 0.9rem; color: #6b7280; margin-top: 15px; font-style: italic;" id="penalty-display"></p>
     </div>
@@ -266,7 +218,7 @@
             { icon: "✨", ans: "date", clue: "We weren't on one, but you smelled like one. A sweet memory trapped in a little bottle.", hint: "Check near your Bella Vita 'Date' perfume." },
             { icon: "👜", ans: "gucci", clue: "I have my own dedicated house inside our house. I carry your things, and the favorites have two C's.", hint: "Look inside your dedicated bag cupboard (check the Gucci!)." },
             { icon: "🦄", ans: "uunty", clue: "I am magical, huge, and I live with you. I might not be a real animal, but I have a highly respected status.", hint: "Ask your giant unicorn soft toy (Uunty)!" },
-            { icon: "💫", ans: "bangles", clue: "We jingle and jangle, a beautiful new Kashmiri addition to a golden red double-boxed collection.", hint: "Check inside your two bangle boxes!" }
+            { icon: "💫", ans: "bangles", clue: "We jingle and jangle, a beautiful new Kashmiri addition to a double-boxed collection.", hint: "Check inside your two bangle boxes!" }
         ];
 
         function shuffleArray(array) {
@@ -282,7 +234,6 @@
         let hintTimerId = null;
 
         const huntScreen = document.getElementById('hunt-screen');
-        const formScreen = document.getElementById('form-screen');
         const clueTitle = document.getElementById('clue-title');
         const clueDesc = document.getElementById('clue-desc');
         const huntAns = document.getElementById('hunt-ans');
@@ -306,10 +257,8 @@
             hintSection.style.display = "none";
             showHintBtn.style.display = "none"; 
 
-            // Clear any existing timer
             if (hintTimerId) clearTimeout(hintTimerId);
             
-            // Start the 30-second timer for the hint
             hintTimerId = setTimeout(() => {
                 showHintBtn.style.display = "inline-block";
             }, 30000); 
@@ -359,47 +308,6 @@
         canvas.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('touchmove', scratch, {passive: false});
 
-        function checkAnswer() {
-            const userAnswer = huntAns.value.trim().toLowerCase();
-            const correctAnswer = allClues[currentStep].ans;
-
-            if (userAnswer === correctAnswer) {
-                currentStep++;
-                if (currentStep < allClues.length) {
-                    loadClue();
-                } else {
-                    if (hintTimerId) clearTimeout(hintTimerId); // Stop the final timer
-                    huntScreen.style.display = 'none';
-                    formScreen.style.display = 'block';
-                }
-            } else {
-                wrongGuessCount++;
-                huntErr.style.display = 'block';
-                
-                // Add CSS shake animation
-                huntScreen.classList.remove('shake');
-                void huntScreen.offsetWidth; // Trigger reflow
-                huntScreen.classList.add('shake');
-
-                // Dynamic error messages
-                const errorMessages = [
-                    "Nope! Keep looking!",
-                    "Uunty is judging you right now... 🦄",
-                    "Not quite! Check again.",
-                    "Are you even trying, Box Fellow? 📦",
-                    "That's definitely not it!"
-                ];
-                huntErr.innerText = errorMessages[Math.floor(Math.random() * errorMessages.length)];
-            }
-        }
-
-        const form = document.getElementById('love-form');
-        const successScreen = document.getElementById('success-screen');
-        const stamp = document.getElementById('approved-stamp');
-        const nameInput = document.getElementById('name');
-        const applicantDisplay = document.getElementById('applicant-display');
-        const penaltyDisplay = document.getElementById('penalty-display');
-
         function spawnHearts() {
             for(let i = 0; i < 40; i++) {
                 setTimeout(() => {
@@ -415,25 +323,56 @@
             }
         }
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const applicantName = nameInput.value.trim();
-            formScreen.style.display = 'none';
-            successScreen.style.display = 'block';
-            applicantDisplay.innerText = `Congratulations, ${applicantName}!`;
+        function checkAnswer() {
+            const userAnswer = huntAns.value.trim().toLowerCase();
+            const correctAnswer = allClues[currentStep].ans;
 
-            // Display penalty for wrong guesses
-            if (wrongGuessCount > 0) {
-                penaltyDisplay.innerText = `PS: You had ${wrongGuessCount} wrong guesses during the hunt. You owe Avinash ${wrongGuessCount} kisses before this application is processed. 😘`;
+            if (userAnswer === correctAnswer) {
+                currentStep++;
+                if (currentStep < allClues.length) {
+                    loadClue();
+                } else {
+                    // Hunt is over! Show the success screen directly.
+                    if (hintTimerId) clearTimeout(hintTimerId); 
+                    huntScreen.style.display = 'none';
+                    
+                    const successScreen = document.getElementById('success-screen');
+                    const stamp = document.getElementById('approved-stamp');
+                    const penaltyDisplay = document.getElementById('penalty-display');
+                    
+                    successScreen.style.display = 'block';
+
+                    if (wrongGuessCount > 0) {
+                        penaltyDisplay.innerText = `PS: You had ${wrongGuessCount} wrong guesses during the hunt. You owe Avinash ${wrongGuessCount} kisses as a penalty! 😘`;
+                    } else {
+                        penaltyDisplay.innerText = "Flawless victory! 0 wrong guesses. You are officially brilliant. 👑";
+                    }
+
+                    setTimeout(() => { stamp.classList.add('animate'); }, 100);
+                    spawnHearts(); 
+                }
             } else {
-                penaltyDisplay.innerText = "Flawless victory! 0 wrong guesses. You are officially brilliant. 👑";
+                wrongGuessCount++;
+                huntErr.style.display = 'block';
+                
+                huntScreen.classList.remove('shake');
+                void huntScreen.offsetWidth; 
+                huntScreen.classList.add('shake');
+
+                const errorMessages = [
+                    "Nope! Keep looking!",
+                    "Uunty is judging you right now... 🦄",
+                    "Not quite! Check again.",
+                    "Are you even trying, Box Fellow? 📦",
+                    "That's definitely not it!"
+                ];
+                huntErr.innerText = errorMessages[Math.floor(Math.random() * errorMessages.length)];
             }
+        }
 
-            setTimeout(() => { stamp.classList.add('animate'); }, 100);
-            spawnHearts(); 
-        });
-
+        // Start the game
         loadClue();
     </script>
 </body>
-</html>
+    </html>
+    
