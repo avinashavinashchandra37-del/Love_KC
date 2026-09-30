@@ -39,12 +39,15 @@
             transform: scale(0.9);
         }
 
+        /* Styling for disabled letters so they look definitively pressed/unavailable */
         .letter-btn:disabled {
             opacity: 0.2;
             transform: scale(0.95);
             background-color: #334155;
             color: #64748b;
             box-shadow: none;
+            border-bottom-width: 0px; /* Flatten the button */
+            margin-top: 4px; /* Move it down to simulate being pressed */
             cursor: not-allowed;
         }
     </style>
@@ -102,7 +105,8 @@
             "Things that Fly", "School Subjects", "Ice Cream Flavors", 
             "Famous Actors", "Video Games", "Things at the Beach", "Insects",
             "Fictional Characters", "Fast Food Chains", "Types of Weather",
-            "Colors", "Things with Wheels", "Types of Candy", "River Names"
+            "Colors", "Things with Wheels", "Types of Candy", "River Names",
+            "Things You Find in a Purse", "Items in a Refrigerator"
         ];
 
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -133,14 +137,16 @@
                 btn.className = 'letter-btn bg-gray-700 hover:bg-gray-600 border-b-4 border-gray-900 text-white font-bold text-xl sm:text-2xl rounded-xl py-3 shadow-md flex items-center justify-center';
                 btn.textContent = letter;
                 btn.disabled = true; // Disabled until game starts
-                btn.onclick = () => handleLetterClick(btn);
+                
+                btn.onclick = () => {
+                    if (gameState !== 'playing') return;
+                    // Disable the button and mark it as used for the round
+                    btn.disabled = true;
+                    btn.setAttribute('data-used', 'true');
+                };
+                
                 letterGrid.appendChild(btn);
             });
-        }
-
-        function handleLetterClick(btn) {
-            if (gameState !== 'playing') return;
-            btn.disabled = true;
         }
 
         function updateTimerVisuals() {
@@ -152,7 +158,7 @@
             const offset = circleCircumference - (progress * circleCircumference);
             timerCircle.style.strokeDashoffset = offset;
 
-            // Color logic
+            // Color logic based on time remaining
             if (timeLeft > 5) {
                 timerCircle.style.stroke = '#3b82f6'; // Blue
                 mainBtn.className = 'w-48 h-48 rounded-full bg-blue-600 hover:bg-blue-500 border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.6)] flex flex-col items-center justify-center transition-all active:scale-95 z-0';
@@ -173,13 +179,10 @@
             mainBtnLabel.textContent = "Reset";
             updateTimerVisuals();
             
-            // Enable available letters if starting fresh
+            // Enable ONLY letters that have NOT been pressed this round
             const buttons = document.querySelectorAll('.letter-btn');
             buttons.forEach(btn => {
-                if (btn.classList.contains('used-this-round')) {
-                    // Logic to maintain disabled state if we wanted to enforce it visually,
-                    // but standard DOM 'disabled' property handles it.
-                } else if (btn.disabled && !btn.hasAttribute('data-used')) {
+                if (btn.getAttribute('data-used') !== 'true') {
                      btn.disabled = false;
                 }
             });
@@ -229,15 +232,16 @@
             
             mainBtn.className = 'w-48 h-48 rounded-full bg-blue-600 hover:bg-blue-500 border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.6)] flex flex-col items-center justify-center transition-all active:scale-95 z-0 cursor-pointer';
 
-            // Reset Letters
+            // Reset all letters - clear the used state but keep disabled until 'Start' is pressed
             const buttons = document.querySelectorAll('.letter-btn');
             buttons.forEach(btn => {
-                btn.disabled = false;
                 btn.removeAttribute('data-used');
+                btn.disabled = true; 
             });
         }
 
         mainBtn.addEventListener('click', () => {
+            // Can start timer if idle or currently playing (resets clock)
             if (gameState === 'idle' || gameState === 'playing') {
                 startTimer();
             }
@@ -249,10 +253,6 @@
         window.onload = () => {
             initLetters();
             startNewRound();
-            // Start game in idle state (letters disabled until they press start)
-            const buttons = document.querySelectorAll('.letter-btn');
-            buttons.forEach(btn => btn.disabled = true);
-            timerText.textContent = "10";
         };
 
     </script>
