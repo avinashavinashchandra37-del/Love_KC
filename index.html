@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Web Tapple - Fast Paced Word Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            user-select: none; /* Prevent text selection during fast tapping */
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .timer-ring {
+            transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .pulse-red {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .letter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .letter-btn:active:not(:disabled) {
+            transform: scale(0.9);
+        }
+
+        .letter-btn:disabled {
+            opacity: 0.2;
+            transform: scale(0.95);
+            background-color: #334155;
+            color: #64748b;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-6 px-4 overflow-x-hidden">
+
+    <div class="w-full max-w-lg flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tighter">
+            WEB TAPPLE
+        </h1>
+        <button id="newRoundBtn" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg border border-gray-600 transition-colors text-sm">
+            New Round
+        </button>
+    </div>
+
+    <div class="w-full max-w-lg bg-gray-800 rounded-3xl p-6 shadow-2xl border border-gray-700 text-center mb-8 relative overflow-hidden">
+        <p class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Current Category</p>
+        <h2 id="categoryDisplay" class="text-3xl sm:text-4xl font-black text-yellow-400 leading-tight min-h-[3rem] flex items-center justify-center">
+            Press New Round
+        </h2>
+        
+        <!-- Game Over Overlay -->
+        <div id="gameOverOverlay" class="absolute inset-0 bg-red-900/90 backdrop-blur-sm flex flex-col items-center justify-center hidden z-10 rounded-3xl">
+            <h3 class="text-5xl font-black text-white mb-2 drop-shadow-lg">TIME'S UP!</h3>
+            <p class="text-red-200 text-lg font-bold">You are eliminated.</p>
+        </div>
+    </div>
+
+    <div class="relative flex justify-center items-center mb-8">
+        <!-- SVG Ring for Timer -->
+        <svg class="absolute w-64 h-64 pointer-events-none" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#334155" stroke-width="12"></circle>
+            <circle id="timerCircle" class="timer-ring" cx="100" cy="100" r="90" fill="none" stroke="#3b82f6" stroke-width="12" stroke-linecap="round" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
+        </svg>
+
+        <!-- Main Action Button -->
+        <button id="mainBtn" class="w-48 h-48 rounded-full bg-blue-600 hover:bg-blue-500 border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.6)] flex flex-col items-center justify-center transition-all active:scale-95 z-0">
+            <span id="timerText" class="text-6xl font-black text-white drop-shadow-md">10</span>
+            <span id="mainBtnLabel" class="text-blue-200 font-bold uppercase tracking-widest mt-1 text-sm">Start</span>
+        </button>
+    </div>
+
+    <div class="w-full max-w-lg">
+        <div id="letterGrid" class="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-3">
+            <!-- Letters will be injected here via JS -->
+        </div>
+    </div>
+
+    <script>
+        const categories = [
+            "Pizza Toppings", "Action Movies", "Animals", "Countries", 
+            "Things that are Green", "Board Games", "Car Brands", "Superheroes", 
+            "Fruits", "Vegetables", "Musical Instruments", "Sports", 
+            "Things in a Kitchen", "Clothing Items", "Body Parts", "Occupations", 
+            "Things that Fly", "School Subjects", "Ice Cream Flavors", 
+            "Famous Actors", "Video Games", "Things at the Beach", "Insects",
+            "Fictional Characters", "Fast Food Chains", "Types of Weather",
+            "Colors", "Things with Wheels", "Types of Candy", "River Names"
+        ];
+
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        
+        let currentTimer = null;
+        let timeLeft = 10.0;
+        const maxTime = 10.0;
+        let gameState = 'idle'; // idle, playing, gameover
+        
+        // DOM Elements
+        const categoryDisplay = document.getElementById('categoryDisplay');
+        const letterGrid = document.getElementById('letterGrid');
+        const mainBtn = document.getElementById('mainBtn');
+        const timerText = document.getElementById('timerText');
+        const mainBtnLabel = document.getElementById('mainBtnLabel');
+        const timerCircle = document.getElementById('timerCircle');
+        const newRoundBtn = document.getElementById('newRoundBtn');
+        const gameOverOverlay = document.getElementById('gameOverOverlay');
+
+        // Circle circumference math for progress bar
+        const circleRadius = 90;
+        const circleCircumference = 2 * Math.PI * circleRadius; // ~565.48
+
+        function initLetters() {
+            letterGrid.innerHTML = '';
+            alphabet.forEach(letter => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-btn bg-gray-700 hover:bg-gray-600 border-b-4 border-gray-900 text-white font-bold text-xl sm:text-2xl rounded-xl py-3 shadow-md flex items-center justify-center';
+                btn.textContent = letter;
+                btn.disabled = true; // Disabled until game starts
+                btn.onclick = () => handleLetterClick(btn);
+                letterGrid.appendChild(btn);
+            });
+        }
+
+        function handleLetterClick(btn) {
+            if (gameState !== 'playing') return;
+            btn.disabled = true;
+        }
+
+        function updateTimerVisuals() {
+            // Update Text
+            timerText.textContent = Math.ceil(timeLeft);
+
+            // Update Ring
+            const progress = timeLeft / maxTime;
+            const offset = circleCircumference - (progress * circleCircumference);
+            timerCircle.style.strokeDashoffset = offset;
+
+            // Color logic
+            if (timeLeft > 5) {
+                timerCircle.style.stroke = '#3b82f6'; // Blue
+                mainBtn.className = 'w-48 h-48 rounded-full bg-blue-600 hover:bg-blue-500 border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.6)] flex flex-col items-center justify-center transition-all active:scale-95 z-0';
+            } else if (timeLeft > 3) {
+                timerCircle.style.stroke = '#facc15'; // Yellow
+                mainBtn.className = 'w-48 h-48 rounded-full bg-yellow-500 hover:bg-yellow-400 border-4 border-yellow-300 shadow-[0_0_30px_rgba(250,204,21,0.6)] flex flex-col items-center justify-center transition-all active:scale-95 z-0';
+            } else {
+                timerCircle.style.stroke = '#ef4444'; // Red
+                mainBtn.className = 'w-48 h-48 rounded-full bg-red-600 hover:bg-red-500 border-4 border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.8)] flex flex-col items-center justify-center transition-all active:scale-95 z-0 pulse-red';
+            }
+        }
+
+        function startTimer() {
+            if (currentTimer) clearInterval(currentTimer);
+            
+            gameState = 'playing';
+            timeLeft = maxTime;
+            mainBtnLabel.textContent = "Reset";
+            updateTimerVisuals();
+            
+            // Enable available letters if starting fresh
+            const buttons = document.querySelectorAll('.letter-btn');
+            buttons.forEach(btn => {
+                if (btn.classList.contains('used-this-round')) {
+                    // Logic to maintain disabled state if we wanted to enforce it visually,
+                    // but standard DOM 'disabled' property handles it.
+                } else if (btn.disabled && !btn.hasAttribute('data-used')) {
+                     btn.disabled = false;
+                }
+            });
+
+            currentTimer = setInterval(() => {
+                timeLeft -= 0.1;
+                
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    endGame();
+                }
+                
+                updateTimerVisuals();
+            }, 100);
+        }
+
+        function endGame() {
+            clearInterval(currentTimer);
+            gameState = 'gameover';
+            mainBtnLabel.textContent = "Time's Up!";
+            gameOverOverlay.classList.remove('hidden');
+            
+            // Disable all letters
+            const buttons = document.querySelectorAll('.letter-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            mainBtn.classList.remove('pulse-red');
+            mainBtn.className = 'w-48 h-48 rounded-full bg-gray-700 border-4 border-gray-500 flex flex-col items-center justify-center transition-all z-0 cursor-not-allowed';
+            timerCircle.style.stroke = '#64748b';
+        }
+
+        function startNewRound() {
+            clearInterval(currentTimer);
+            gameState = 'idle';
+            timeLeft = maxTime;
+            
+            // Pick random category
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            categoryDisplay.textContent = randomCat;
+            
+            // Reset UI
+            gameOverOverlay.classList.add('hidden');
+            mainBtnLabel.textContent = "Start";
+            timerText.textContent = "10";
+            timerCircle.style.strokeDashoffset = "0";
+            timerCircle.style.stroke = '#3b82f6';
+            
+            mainBtn.className = 'w-48 h-48 rounded-full bg-blue-600 hover:bg-blue-500 border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.6)] flex flex-col items-center justify-center transition-all active:scale-95 z-0 cursor-pointer';
+
+            // Reset Letters
+            const buttons = document.querySelectorAll('.letter-btn');
+            buttons.forEach(btn => {
+                btn.disabled = false;
+                btn.removeAttribute('data-used');
+            });
+        }
+
+        mainBtn.addEventListener('click', () => {
+            if (gameState === 'idle' || gameState === 'playing') {
+                startTimer();
+            }
+        });
+
+        newRoundBtn.addEventListener('click', startNewRound);
+
+        // Initialize on load
+        window.onload = () => {
+            initLetters();
+            startNewRound();
+            // Start game in idle state (letters disabled until they press start)
+            const buttons = document.querySelectorAll('.letter-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            timerText.textContent = "10";
+        };
+
+    </script>
+</body>
+</html>
